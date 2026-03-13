@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #faf9f7;
+  color: #111827;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Dark mode base — applied when ThemeProvider wrapper has class="dark" */
+.dark body,
+.dark {
+  background-color: #030712;
+  color: #f3f4f6;
+}
+
+/* Age slider thumb styling */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a5c4a;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a5c4a;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.dark input[type='range']::-webkit-slider-thumb {
+  background: #7a907a;
+  border-color: #1f2937;
+}
+
+/* Prose styles */
+.prose-hypno h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dark .prose-hypno h2 {
+  color: #d1d5db;
+}
+
+.prose-hypno p {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+}
+
+.prose-hypno ul,
+.prose-hypno ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-hypno li {
+  margin-bottom: 0.25rem;
+  line-height: 1.6;
+}
