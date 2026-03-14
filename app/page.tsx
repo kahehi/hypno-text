@@ -8,7 +8,6 @@ import CaseForm from '@/components/CaseForm';
 import OutputTabs from '@/components/OutputTabs';
 import FeedbackBubble from '@/components/FeedbackBubble';
 import type { CaseInput, GenerationResponse } from '@/types';
-import { useTheme } from '@/lib/theme-context';
 
 const FEATURES = [
   { label: 'Fallreflexion',      desc: 'Strukturiert & hypothesenbasiert' },
@@ -18,7 +17,6 @@ const FEATURES = [
 ];
 
 export default function HomePage() {
-  const { apiKey } = useTheme();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +32,7 @@ export default function HomePage() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, _apiKey: apiKey || undefined }),
+        body: JSON.stringify(data),
       });
 
       const json = await res.json();

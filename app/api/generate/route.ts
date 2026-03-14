@@ -11,9 +11,9 @@ import {
   buildTranceStichwortPrompt,
 } from '@/lib/prompts';
 
-function getClient(apiKey?: string) {
+function getClient() {
   return new OpenAI({
-    apiKey: apiKey || process.env.OPENAI_API_KEY || '',
+    apiKey: process.env.OPENAI_API_KEY || '',
     baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
   });
 }
@@ -23,10 +23,9 @@ const MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 async function generateText(
   system: string,
   user: string,
-  apiKey?: string,
   maxTokens = 1500
 ): Promise<string> {
-  const response = await getClient(apiKey).chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: MODEL,
     messages: [
       { role: 'system', content: system },
@@ -47,11 +46,10 @@ function countWords(text: string): number {
 async function generateTranceText(
   system: string,
   user: string,
-  apiKey: string | undefined,
   targetWords: number,
   maxTokens: number
 ): Promise<string> {
-  let text = await generateText(system, user, apiKey, maxTokens);
+  let text = await generateText(system, user, maxTokens);
   let wordCount = countWords(text);
 
   let rounds = 0;
@@ -65,7 +63,6 @@ async function generateTranceText(
     const continuation = await generateText(
       system,
       `Setze diesen Trancetext nahtlos fort. Es fehlen noch ${missing} Wörter bis zur Gesamtvorgabe von ${targetWords} Wörtern. Vertiefe bestehende Bilder, kreise zu früheren Empfindungen zurück, verweile länger. Kein neuer Abschnittstitel – fließende Fortsetzung im selben Stil.\n\n[…] ${tail}`,
-      apiKey,
       extTokens
     );
 
@@ -80,7 +77,7 @@ async function generateTranceText(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { _apiKey, ...input } = body as CaseInput & { _apiKey?: string };
+    const input = body as CaseInput;
 
     if (!input.caseTitle || !input.concern || !input.goal) {
       return NextResponse.json(
@@ -98,7 +95,7 @@ export async function POST(req: NextRequest) {
 
     const relevantChunks = getRelevantChunks(searchQuery, 6);
 
-    const gen = (system: string, user: string) => generateText(system, user, _apiKey);
+    const gen = (system: string, user: string) => generateText(system, user);
 
     const sp  = buildSummaryPrompt(input, relevantChunks);
     const rp  = buildReflectionPrompt(input, relevantChunks);
@@ -113,7 +110,7 @@ export async function POST(req: NextRequest) {
     const [summaryText, reflectionText, ericksonText, sessionText, approachRaw, tranceKeywords] = await Promise.all([
       gen(sp.system, sp.user),
       gen(rp.system, rp.user),
-      generateTranceText(ep.system, ep.user, _apiKey, ep.totalWords, tranceMaxTokens),
+      generateTranceText(ep.system, ep.user, ep.totalWords, tranceMaxTokens),
       gen(sfp.system, sfp.user),
       gen(sap.system, sap.user),
       gen(skp.system, skp.user),

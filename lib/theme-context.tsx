@@ -5,26 +5,19 @@ import { createContext, useContext, useEffect, useState } from 'react';
 interface ThemeContextType {
   dark: boolean;
   toggleDark: () => void;
-  apiKey: string;
-  setApiKey: (key: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   dark: false,
   toggleDark: () => {},
-  apiKey: '',
-  setApiKey: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [dark, setDark] = useState(false);
-  const [apiKey, setApiKeyState] = useState('');
 
   useEffect(() => {
     const storedDark = localStorage.getItem('hypno-dark');
     if (storedDark === 'true') setDark(true);
-    const storedKey = localStorage.getItem('hypno-apikey');
-    if (storedKey) setApiKeyState(storedKey);
   }, []);
 
   const toggleDark = () => {
@@ -35,17 +28,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const setApiKey = (key: string) => {
-    setApiKeyState(key);
-    if (key) {
-      localStorage.setItem('hypno-apikey', key);
-    } else {
-      localStorage.removeItem('hypno-apikey');
-    }
-  };
-
   return (
-    <ThemeContext.Provider value={{ dark, toggleDark, apiKey, setApiKey }}>
+    <ThemeContext.Provider value={{ dark, toggleDark }}>
       {/*
         display:contents removes the div from layout flow but keeps it in the
         DOM tree. Tailwind's `.dark .dark\:*` selectors match all descendants

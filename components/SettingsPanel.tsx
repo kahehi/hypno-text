@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { X, Eye, EyeOff, Sun, Moon, Key, Check } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/lib/theme-context';
 import KnowledgeStatus from './KnowledgeStatus';
@@ -12,21 +12,8 @@ interface Props {
 }
 
 export default function SettingsPanel({ open, onClose }: Props) {
-  const { dark, toggleDark, apiKey, setApiKey } = useTheme();
-  const [keyInput, setKeyInput] = useState(apiKey);
-  const [showKey, setShowKey] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const { dark, toggleDark } = useTheme();
   const overlayRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setKeyInput(apiKey);
-  }, [apiKey]);
-
-  const handleSaveKey = () => {
-    setApiKey(keyInput.trim());
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === overlayRef.current) onClose();
@@ -94,57 +81,6 @@ export default function SettingsPanel({ open, onClose }: Props) {
                     dark ? 'translate-x-6' : 'translate-x-0'
                   )}
                 />
-              </button>
-            </div>
-          </div>
-
-          {/* API Key */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-              API-Konfiguration
-            </p>
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 space-y-3">
-              <div className="flex items-center gap-2">
-                <Key size={16} className="text-gray-400" />
-                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                  OpenAI API-Key
-                </p>
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Überschreibt den API-Key aus <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">.env.local</code>. Wird nur im Arbeitsspeicher gehalten – beim Schließen des Tabs gelöscht.
-              </p>
-              <div className="relative">
-                <input
-                  type={showKey ? 'text' : 'password'}
-                  value={keyInput}
-                  onChange={e => setKeyInput(e.target.value)}
-                  placeholder="sk-..."
-                  className={cn(
-                    'w-full pr-10 pl-3 py-2.5 rounded-lg border text-sm font-mono transition-all outline-none',
-                    'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700',
-                    'text-gray-800 dark:text-gray-100 placeholder-gray-400',
-                    'focus:ring-2 focus:ring-sage-400 focus:border-transparent'
-                  )}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowKey(s => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
-              </div>
-              <button
-                onClick={handleSaveKey}
-                className={cn(
-                  'flex items-center gap-2 text-sm px-4 py-2 rounded-lg font-medium transition-all',
-                  saved
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-sage-600 text-white hover:bg-sage-700'
-                )}
-              >
-                {saved ? <Check size={14} /> : <Key size={14} />}
-                {saved ? 'Gespeichert' : 'Speichern'}
               </button>
             </div>
           </div>
