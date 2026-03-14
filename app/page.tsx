@@ -1,21 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, Brain, FileText, Layers, BookOpen } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
 import NoticeBanner from '@/components/NoticeBanner';
 import CaseForm from '@/components/CaseForm';
 import OutputTabs from '@/components/OutputTabs';
-import KnowledgeStatus from '@/components/KnowledgeStatus';
 import FeedbackBubble from '@/components/FeedbackBubble';
 import type { CaseInput, GenerationResponse } from '@/types';
 import { useTheme } from '@/lib/theme-context';
 
 const FEATURES = [
-  { icon: Brain, label: 'Fallreflexion', desc: 'Strukturierte hypnotherapeutische Reflexion' },
-  { icon: Layers, label: 'Erickson-inspiriert', desc: 'Indirekte, metaphorische Formulierungen' },
-  { icon: FileText, label: '4 Varianten', desc: 'Kurzfassung bis Sitzungsfokus' },
-  { icon: BookOpen, label: 'Wissensbasis', desc: 'Lokale PDFs als Hintergrundwissen' },
+  { label: 'Fallreflexion',      desc: 'Strukturiert & hypothesenbasiert' },
+  { label: 'Trancetext',         desc: 'Passiv, ericksonian, atmend' },
+  { label: 'Sitzungsfokus',      desc: 'Therapeutische Stoßrichtungen' },
+  { label: 'Wissensbasis',       desc: 'Lokale PDFs als Kontext' },
 ];
 
 export default function HomePage() {
@@ -47,7 +46,6 @@ export default function HomePage() {
 
       setResult(json as GenerationResponse);
 
-      // Smooth scroll to results
       setTimeout(() => {
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
@@ -62,87 +60,114 @@ export default function HomePage() {
     <div className="min-h-screen bg-warm-50 dark:bg-gray-950 transition-colors">
       <AppHeader />
 
-      {/* Hero Strip */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
-        <div className="max-w-5xl mx-auto px-6 py-10">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight leading-snug mb-3">
-              Professionelle Texte.<br />
-              <span className="text-sage-600 dark:text-sage-400">Ressourcenorientiert. Indirekt.</span>
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-              Trage die Fallinformationen ein und erhalte vier durchdachte Textvarianten –
-              von der prägnanten Kurzfassung bis zur ericksonianischen Formulierung.
-            </p>
-          </div>
+      {/* ── Hero ─────────────────────────────────────────────────────────────── */}
+      <section className="hero-atmosphere relative overflow-hidden min-h-[72vh] flex flex-col justify-center">
 
-          {/* Feature pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8">
-            {FEATURES.map(({ icon: Icon, label, desc }) => (
-              <div
-                key={label}
-                className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
-              >
-                <div className="w-7 h-7 rounded-lg bg-sage-100 dark:bg-sage-900/50 flex items-center justify-center shrink-0">
-                  <Icon size={14} className="text-sage-600 dark:text-sage-400" />
+        {/* Animated ambient orb */}
+        <div
+          className="hero-orb absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 55% 65% at 68% 30%, rgba(50, 110, 65, 0.18) 0%, transparent 65%)',
+          }}
+        />
+
+        {/* Decorative hypnotic rings — top right */}
+        <div className="absolute -top-24 -right-24 w-[620px] h-[620px] opacity-[0.055] pointer-events-none select-none">
+          <svg viewBox="0 0 620 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {[40, 85, 130, 178, 228, 282, 340, 400, 462].map(r => (
+              <circle key={r} cx="310" cy="310" r={r} stroke="white" strokeWidth="0.8" />
+            ))}
+            <line x1="310" y1="0"   x2="310" y2="620" stroke="white" strokeWidth="0.5" opacity="0.4" />
+            <line x1="0"   y1="310" x2="620" y2="310" stroke="white" strokeWidth="0.5" opacity="0.4" />
+            <line x1="0"   y1="0"   x2="620" y2="620" stroke="white" strokeWidth="0.4" opacity="0.25" />
+            <line x1="620" y1="0"   x2="0"   y2="620" stroke="white" strokeWidth="0.4" opacity="0.25" />
+          </svg>
+        </div>
+
+        {/* Thin accent line — left edge */}
+        <div className="absolute left-0 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-sage-600/40 to-transparent" />
+
+        {/* Bottom fade to page background */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-warm-50 dark:from-gray-950 to-transparent" />
+
+        {/* Hero content */}
+        <div className="relative z-10 max-w-5xl mx-auto px-6 py-28">
+
+          {/* Overline */}
+          <p className="anim-0 text-[0.62rem] font-medium tracking-[0.28em] uppercase text-sage-400/80 mb-7">
+            Hypnotherapeutischer Schreib- und Reflexionsassistent
+          </p>
+
+          {/* Main heading */}
+          <h1 className="anim-1 font-display font-light leading-[1.06] tracking-tight mb-8"
+              style={{ fontSize: 'clamp(2.8rem, 6vw, 5.2rem)', color: '#f0ece4' }}>
+            Worte, die<br />
+            <em className="not-italic"
+                style={{ color: '#c8b97a' }}>
+              zwischen den Zeilen
+            </em><br />
+            wirken.
+          </h1>
+
+          {/* Subtitle */}
+          <p className="anim-2 font-light leading-relaxed mb-14"
+             style={{ color: 'rgba(240, 236, 228, 0.6)', fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)', maxWidth: '36rem' }}>
+            Aus Fallinformationen entstehen vier durchdachte Textvarianten —
+            von der klinischen Fallreflexion bis zum ericksonianischen Trancetext.
+          </p>
+
+          {/* Feature row */}
+          <div className="anim-3 flex flex-wrap gap-x-10 gap-y-4">
+            {FEATURES.map(({ label, desc }) => (
+              <div key={label} className="group">
+                <div className="text-[0.72rem] font-medium text-white/55 tracking-wide mb-0.5 group-hover:text-white/75 transition-colors">
+                  {label}
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{label}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-snug mt-0.5">{desc}</p>
+                <div className="text-[0.65rem] text-white/28 tracking-wide">
+                  {desc}
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Scroll indicator */}
+          <div className="anim-4 mt-20 flex items-center gap-3 text-white/25">
+            <div className="w-6 h-px bg-white/20" />
+            <span className="text-[0.6rem] tracking-[0.2em] uppercase">Fallerfassung</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="opacity-50">
+              <path d="M6 2v8M3 7l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        <NoticeBanner />
+      {/* ── Form section ─────────────────────────────────────────────────────── */}
+      <main className="bg-warm-50 dark:bg-gray-950 transition-colors">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-7">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          <div className="lg:col-span-2">
+          <NoticeBanner />
+
+          <div className="max-w-2xl mx-auto">
             <CaseForm onGenerate={handleGenerate} loading={loading} />
           </div>
-          <div className="space-y-4">
-            <KnowledgeStatus />
 
-            {/* Tips card */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5">
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
-                Hinweise
-              </p>
-              <ul className="space-y-2">
-                {[
-                  'Je mehr Kontext, desto präziser die Ausgabe',
-                  'Hypothesen hypothetisch formulieren – das Tool spiegelt deinen Stil',
-                  'Ressourcen aktiv benennen fördert ressourcenorientierte Texte',
-                  'PDFs in /knowledge legen und neu indexieren für Wissenseinbindung',
-                ].map(tip => (
-                  <li key={tip} className="flex gap-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                    <span className="text-sage-400 shrink-0 mt-0.5">·</span>
-                    {tip}
-                  </li>
-                ))}
-              </ul>
+          {error && (
+            <div className="max-w-2xl mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-5 py-4 flex gap-3 items-start">
+              <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-red-800 dark:text-red-300">Fehler</p>
+                <p className="text-sm text-red-700 dark:text-red-400 mt-0.5">{error}</p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {result && (
+            <div id="results" className="max-w-2xl mx-auto">
+              <OutputTabs result={result} caseTitle={caseTitle} />
+            </div>
+          )}
         </div>
-
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-5 py-4 flex gap-3 items-start">
-            <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-red-800 dark:text-red-300">Fehler</p>
-              <p className="text-sm text-red-700 dark:text-red-400 mt-0.5">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {result && (
-          <div id="results">
-            <OutputTabs result={result} caseTitle={caseTitle} />
-          </div>
-        )}
       </main>
 
       <FeedbackBubble />

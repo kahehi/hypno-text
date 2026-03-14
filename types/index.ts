@@ -54,6 +54,7 @@ export interface GenerationResponse {
   variants: OutputVariant[];
   usedChunks: KnowledgeChunk[];
   sigristApproach?: SigristApproach;
+  tranceKeywords?: string;
   error?: string;
 }
 

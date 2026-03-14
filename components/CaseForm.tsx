@@ -64,6 +64,27 @@ export default function CaseForm({ onGenerate, loading }: Props) {
   const [suggestionMin, setSuggestionMin] = useState<number>(15);
   const [exitMin, setExitMin] = useState<number>(5);
 
+  const handleDemoLoad = (data: CaseInput) => {
+    setForm(data);
+    if (data.context) {
+      const matched = CONTEXT_OPTIONS.filter(opt => data.context.includes(opt));
+      setSelectedContexts(matched);
+      const remaining = data.context
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s && !CONTEXT_OPTIONS.includes(s))
+        .join(', ');
+      setCustomContext(remaining);
+    }
+    if (data.clientAge) {
+      const n = parseInt(data.clientAge);
+      if (!isNaN(n)) setAgeValue(n);
+    }
+    if (data.inductionMinutes !== undefined) setInductionMin(data.inductionMinutes);
+    if (data.suggestionMinutes !== undefined) setSuggestionMin(data.suggestionMinutes);
+    if (data.exitMinutes !== undefined) setExitMin(data.exitMinutes);
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -108,29 +129,17 @@ export default function CaseForm({ onGenerate, loading }: Props) {
     setExitMin(5);
   };
 
-  const handleDemoLoad = (data: CaseInput) => {
-    setForm(data);
-    // Parse context back to checkboxes
-    if (data.context) {
-      const matched = CONTEXT_OPTIONS.filter(opt => data.context.includes(opt));
-      setSelectedContexts(matched);
-      const remaining = data.context
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s && !CONTEXT_OPTIONS.includes(s))
-        .join(', ');
-      setCustomContext(remaining);
-    }
-    if (data.clientAge) {
-      const n = parseInt(data.clientAge);
-      if (!isNaN(n)) setAgeValue(n);
-    }
-  };
-
   const isValid = form.caseTitle && form.concern && form.goal;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+
+      {/* Demo-Fall — zentriert über Fallbasis */}
+      <div className="flex flex-col items-center gap-2 py-2">
+        <p className="text-xs text-gray-400 dark:text-gray-500">Starte mit einem Beispielfall</p>
+        <DemoCaseButton onLoad={handleDemoLoad} />
+      </div>
+
       <SectionCard title="Fallbasis">
         <div className="space-y-4">
           <div>
@@ -341,7 +350,6 @@ export default function CaseForm({ onGenerate, loading }: Props) {
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <DemoCaseButton onLoad={handleDemoLoad} />
           <button
             type="button"
             onClick={handleReset}

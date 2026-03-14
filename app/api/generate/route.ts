@@ -8,27 +8,73 @@ import {
   buildEricksonianPrompt,
   buildSessionFocusPrompt,
   buildSigristApproachPrompt,
+  buildTranceStichwortPrompt,
 } from '@/lib/prompts';
+
+function getClient(apiKey?: string) {
+  return new OpenAI({
+    apiKey: apiKey || process.env.OPENAI_API_KEY || '',
+    baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+  });
+}
+
+const MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 
 async function generateText(
   system: string,
   user: string,
-  apiKey?: string
+  apiKey?: string,
+  maxTokens = 1500
 ): Promise<string> {
-  const client = new OpenAI({
-    apiKey: apiKey || process.env.OPENAI_API_KEY || '',
-    baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
-  });
-  const response = await client.chat.completions.create({
-    model: process.env.OPENAI_MODEL || 'gpt-4o',
+  const response = await getClient(apiKey).chat.completions.create({
+    model: MODEL,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
     temperature: 0.7,
-    max_tokens: 1500,
+    max_tokens: maxTokens,
   });
   return response.choices[0]?.message?.content || '';
+}
+
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
+
+// Generates a trance text and extends it in a loop until the target word count
+// is reached (max 3 extension rounds, threshold 88% of target).
+async function generateTranceText(
+  system: string,
+  user: string,
+  apiKey: string | undefined,
+  targetWords: number,
+  maxTokens: number
+): Promise<string> {
+  let text = await generateText(system, user, apiKey, maxTokens);
+  let wordCount = countWords(text);
+
+  let rounds = 0;
+  while (wordCount < targetWords * 0.88 && rounds < 3) {
+    const missing = targetWords - wordCount;
+    const extTokens = Math.min(4000, Math.ceil(missing * 1.6));
+
+    // Use only the last ~200 words as context to keep the prompt lean
+    const tail = text.trim().split(/\s+/).slice(-200).join(' ');
+
+    const continuation = await generateText(
+      system,
+      `Setze diesen Trancetext nahtlos fort. Es fehlen noch ${missing} Wörter bis zur Gesamtvorgabe von ${targetWords} Wörtern. Vertiefe bestehende Bilder, kreise zu früheren Empfindungen zurück, verweile länger. Kein neuer Abschnittstitel – fließende Fortsetzung im selben Stil.\n\n[…] ${tail}`,
+      apiKey,
+      extTokens
+    );
+
+    text = text + '\n\n' + continuation;
+    wordCount = countWords(text);
+    rounds++;
+  }
+
+  return text;
 }
 
 export async function POST(req: NextRequest) {
@@ -54,18 +100,23 @@ export async function POST(req: NextRequest) {
 
     const gen = (system: string, user: string) => generateText(system, user, _apiKey);
 
-    const sp = buildSummaryPrompt(input, relevantChunks);
-    const rp = buildReflectionPrompt(input, relevantChunks);
-    const ep = buildEricksonianPrompt(input, relevantChunks);
+    const sp  = buildSummaryPrompt(input, relevantChunks);
+    const rp  = buildReflectionPrompt(input, relevantChunks);
+    const ep  = buildEricksonianPrompt(input, relevantChunks);
     const sfp = buildSessionFocusPrompt(input, relevantChunks);
     const sap = buildSigristApproachPrompt(input);
+    const skp = buildTranceStichwortPrompt(input);
 
-    const [summaryText, reflectionText, ericksonText, sessionText, approachRaw] = await Promise.all([
+    // Trancetext: ~1.4 Tokens/Wort (Deutsch) × 1.4 Puffer für die erste Generation, mind. 2000
+    const tranceMaxTokens = Math.min(8000, Math.max(2000, Math.ceil(ep.totalWords * 1.4 * 1.4)));
+
+    const [summaryText, reflectionText, ericksonText, sessionText, approachRaw, tranceKeywords] = await Promise.all([
       gen(sp.system, sp.user),
       gen(rp.system, rp.user),
-      gen(ep.system, ep.user),
+      generateTranceText(ep.system, ep.user, _apiKey, ep.totalWords, tranceMaxTokens),
       gen(sfp.system, sfp.user),
       gen(sap.system, sap.user),
+      gen(skp.system, skp.user),
     ]);
 
     let sigristApproach: SigristApproach | undefined;
@@ -78,11 +129,11 @@ export async function POST(req: NextRequest) {
     const variants: OutputVariant[] = [
       { id: 'summary', label: 'Kurzfassung', type: 'summary', content: summaryText },
       { id: 'reflection', label: 'Fachliche Fallreflexion', type: 'reflection', content: reflectionText },
-      { id: 'ericksonian', label: 'Trancetext (Tom Sigrist)', type: 'ericksonian', content: ericksonText },
+      { id: 'ericksonian', label: 'Trancetext (Ericksonian)', type: 'ericksonian', content: ericksonText },
       { id: 'sessionfocus', label: 'Sitzungsfokus', type: 'sessionfocus', content: sessionText },
     ];
 
-    const response: GenerationResponse = { variants, usedChunks: relevantChunks, sigristApproach };
+    const response: GenerationResponse = { variants, usedChunks: relevantChunks, sigristApproach, tranceKeywords: tranceKeywords || undefined };
     return NextResponse.json(response);
   } catch (err) {
     console.error('Generate error:', err);

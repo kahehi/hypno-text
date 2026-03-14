@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Eye, EyeOff, Sun, Moon, Key, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/lib/theme-context';
+import KnowledgeStatus from './KnowledgeStatus';
 
 interface Props {
   open: boolean;
@@ -41,7 +42,7 @@ export default function SettingsPanel({ open, onClose }: Props) {
     >
       <div
         className={cn(
-          'w-full max-w-md mx-4 rounded-2xl overflow-hidden shadow-2xl',
+          'w-full max-w-lg mx-4 rounded-2xl overflow-hidden shadow-2xl',
           'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700'
         )}
       >
@@ -146,6 +147,34 @@ export default function SettingsPanel({ open, onClose }: Props) {
                 {saved ? 'Gespeichert' : 'Speichern'}
               </button>
             </div>
+          </div>
+
+          {/* Wissensbasis */}
+          <div>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+              Wissensbasis
+            </p>
+            <KnowledgeStatus />
+          </div>
+
+          {/* Hinweise */}
+          <div>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+              Hinweise
+            </p>
+            <ul className="space-y-2">
+              {[
+                'Je mehr Kontext, desto präziser die Ausgabe',
+                'Hypothesen hypothetisch formulieren – das Tool spiegelt deinen Stil',
+                'Ressourcen aktiv benennen fördert ressourcenorientierte Texte',
+                'PDFs in /knowledge legen und neu indexieren für Wissenseinbindung',
+              ].map(tip => (
+                <li key={tip} className="flex gap-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <span className="text-sage-400 shrink-0 mt-0.5">·</span>
+                  {tip}
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Info */}

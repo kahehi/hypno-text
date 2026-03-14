@@ -37,7 +37,7 @@ export default function OutputTabs({ result, caseTitle }: Props) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wide">
-                  Tom Sigrist — Empfohlener Ansatz
+                  Empfohlener Ansatz
                 </span>
               </div>
               <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-2">
@@ -78,7 +78,11 @@ export default function OutputTabs({ result, caseTitle }: Props) {
 
       <div className="space-y-4">
         {result.variants.map(variant => (
-          <OutputCard key={variant.id} variant={variant} />
+          <OutputCard
+            key={variant.id}
+            variant={variant}
+            tranceKeywords={variant.type === 'ericksonian' ? result.tranceKeywords : undefined}
+          />
         ))}
       </div>
 

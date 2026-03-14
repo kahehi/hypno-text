@@ -1,29 +1,81 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  background-color: #faf9f7;
-  color: #111827;
-  transition: background-color 0.2s, color 0.2s;
+:root {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
 }
 
-/* Dark mode base — applied when ThemeProvider wrapper has class="dark" */
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  background-color: #faf9f7;
+  color: #1a1a18;
+  transition: background-color 0.3s, color 0.3s;
+}
+
 .dark body,
 .dark {
   background-color: #030712;
   color: #f3f4f6;
 }
 
-/* Age slider thumb styling */
+/* ── Hero atmospheric background ───────────────────────────────────────────── */
+
+.hero-atmosphere {
+  background:
+    linear-gradient(215deg, rgba(74, 124, 89, 0.12) 0%, transparent 38%),
+    radial-gradient(ellipse 90% 70% at -5% 108%, rgba(6, 18, 8, 0.96) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 85% at 58% 48%, rgba(14, 36, 18, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 75% 38% at 74% 0%,  rgba(32, 76, 44, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse 48% 55% at 12% 28%, rgba(22, 54, 28, 0.45) 0%, transparent 50%),
+    #09160b;
+  position: relative;
+}
+
+/* Film-grain noise overlay */
+.hero-atmosphere::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Slow ambient breathing on the decorative orb */
+@keyframes heroBreath {
+  0%, 100% { opacity: 0.55; transform: scale(1)    translate(0px, 0px); }
+  33%       { opacity: 0.75; transform: scale(1.05) translate(-14px, -10px); }
+  66%       { opacity: 0.45; transform: scale(0.97) translate(10px, 8px); }
+}
+
+.hero-orb {
+  animation: heroBreath 16s ease-in-out infinite;
+}
+
+/* ── Page-load stagger ──────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-0 { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-1 { animation: fadeUp 0.9s 0.13s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-2 { animation: fadeUp 0.9s 0.27s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-3 { animation: fadeUp 0.9s 0.41s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-4 { animation: fadeUp 0.9s 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ── Slider thumb ────────────────────────────────────────────────────────────── */
+
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   border-radius: 50%;
   background: #4a5c4a;
   cursor: pointer;
@@ -32,8 +84,7 @@ input[type='range']::-webkit-slider-thumb {
 }
 
 input[type='range']::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   border-radius: 50%;
   background: #4a5c4a;
   cursor: pointer;
@@ -45,7 +96,8 @@ input[type='range']::-moz-range-thumb {
   border-color: #1f2937;
 }
 
-/* Prose styles */
+/* ── Prose ──────────────────────────────────────────────────────────────────── */
+
 .prose-hypno h2 {
   font-size: 1rem;
   font-weight: 600;
@@ -54,22 +106,9 @@ input[type='range']::-moz-range-thumb {
   margin-bottom: 0.5rem;
 }
 
-.dark .prose-hypno h2 {
-  color: #d1d5db;
-}
+.dark .prose-hypno h2 { color: #d1d5db; }
 
-.prose-hypno p {
-  margin-bottom: 0.75rem;
-  line-height: 1.7;
-}
-
+.prose-hypno p       { margin-bottom: 0.75rem; line-height: 1.7; }
 .prose-hypno ul,
-.prose-hypno ol {
-  margin-left: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
-.prose-hypno li {
-  margin-bottom: 0.25rem;
-  line-height: 1.6;
-}
+.prose-hypno ol      { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+.prose-hypno li      { margin-bottom: 0.25rem; line-height: 1.6; }
